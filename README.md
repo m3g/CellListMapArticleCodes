@@ -9,4 +9,6 @@ Code blocks of the CellListMap paper explained.
 <a href=http://m3g.github.io/CellListMapArticleCodes/CodeBlock6.jl.html>Code Block 6</a><br>
 <a href=http://m3g.github.io/CellListMapArticleCodes/CodeBlock7.jl.html>Code Block 7</a><br>
 <a href=http://m3g.github.io/CellListMapArticleCodes/CodeBlock8.jl.html>Code Block 8</a><br>
+<a href=http://m3g.github.io/CellListMapArticleCodes/CodeBlock9.jl.html>Code Block 9</a><br>
+<a href=http://m3g.github.io/CellListMapArticleCodes/CodeBlock10.jl.html>Code Block 10</a><br>
 
