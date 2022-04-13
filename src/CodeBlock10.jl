@@ -28,7 +28,7 @@ md"
 
 # ╔═╡ b68cfd92-d1b3-4f33-b9bf-8f72b101a5b9
 md"
-In this block we implement the computation of a histogram of \"galactic\" pair velocities, which is typical of astrophysical simulation analsys. The computation consists in obtainin an histogram of the relative velocities of the galaxies, as a function of their distances. 
+In this block we implement the computation of a histogram of \"galactic\" pair velocities, which is typical of astrophysical simulation analysis. The computation consists in obtainin an histogram of the relative velocities of the galaxies, as a function of their distances. 
 
 Thus, for each distance between the galaxies, we want to obtain the average relative speed between the galaxies. This involves counting the number of pairs of galaxies at each distance, summing up their relative velocities, and averaging.
 
