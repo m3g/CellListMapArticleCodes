@@ -154,20 +154,21 @@ md"
 In this simple example, it is easy to confirm that this result is correct, by computing the gradient by hand, also using `CellListMap`:
 "
 
+# ╔═╡ 61f27118-7aff-46ea-9604-7596915b95fd
+function update_∇f!(x,y,i,j,d2,∇f)
+	r = x - y
+	∇f[:,i] .= r / sqrt(d2)
+	∇f[:,j] .= -r / sqrt(d2)
+	return ∇f
+end
+
 # ╔═╡ b2e15594-43f0-4998-9f2b-93191122a858
 function ∇sum_d(x::Matrix{T},sides,cutoff) where T
 	box = Box(T.(sides),T(cutoff))
 	cl = CellList(x,box)
 	∇f = zeros(T,size(x))
-	return map_pairwise!(
-		(x,y,i,j,d2,∇f) -> begin
-			r = x - y
-			∇f[:,i] .= r / sqrt(d2)
-			∇f[:,j] .= -r / sqrt(d2)
-			return ∇f
-		end,
-		∇f, box, cl
-	)
+	map_pairwise!(update_∇f!, ∇f, box, cl)
+	return ∇f
 end
 
 # ╔═╡ 5e06aabe-a051-4635-93c2-0f0cb7b7775c
@@ -596,6 +597,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═aa105270-a04a-4952-90fd-e94777d9ec41
 # ╠═fe0e4fd7-6f9c-4457-8dc2-1ede4b7f3835
 # ╟─5327ace0-1b45-49a0-b056-bb6d9a589fdf
+# ╠═61f27118-7aff-46ea-9604-7596915b95fd
 # ╠═b2e15594-43f0-4998-9f2b-93191122a858
 # ╠═5e06aabe-a051-4635-93c2-0f0cb7b7775c
 # ╟─64de2303-3fca-4b84-b235-7e9cb4a31da0
