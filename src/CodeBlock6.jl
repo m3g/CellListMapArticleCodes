@@ -30,7 +30,7 @@ Load the CellListMap package
 
 # ╔═╡ dc0e8a10-30ba-44e5-be65-61b0402ed2ed
 md"
-This example involves the computation of Lennard-Jones potential, in which exponential terms with high powers have to be computed. We use the `FastPow` package to automatically decompose these into smaller powers, accelerating the computation:
+This example involves the computation of Lennard-Jones potential, in which exponential terms with high powers have to be evaluated. We use the `FastPow` package to automatically decompose these into smaller powers, accelerating the computation:
 "
 
 # ╔═╡ 8d685c45-f9d7-42fd-a6e5-28361d4a7de3
@@ -40,7 +40,7 @@ The Lennard-Jones potential for a pair of particles has the form
 $u = 4\varepsilon \left[\left(\frac{\sigma}{d}\right)^{12} 
                            - \left(\frac{\sigma}{d}\right)^6\right]$
 
-where $d$ is the distance between the particles, $\epsilon$ is the depth of the potential well, and $\sigma$ is the combined radii of the particles. 
+where $d$ is the distance between the particles, $\varepsilon$ is the depth of the potential well, and $\sigma$ is the combined radii of the particles. 
 
 Since the interface provided by `CellListMap` gives us the squared distance, we rewrite this expression as:
 
@@ -55,9 +55,9 @@ ulj(d2,ε,σ,u) = @fastpow u += 4ε*((σ^2/d2)^6 - (σ^2/d2)^3)
 
 # ╔═╡ 4cfdc28c-66c8-4924-9069-b955ccc22c98
 md"
-In the example of this block, we construct a system which has a physical meaning: it is a fluid of Neon atoms, with an atomic density similar to that of water. With that, the computational cost of the computation is of the order of what will be observed for most condensed-phase systems. 
+In the example of this block, we construct a system with physical meaning: it is a fluid of Neon atoms, with an atomic density similar to that of water. With that, the cost of the computation is of the order of what is observed for most condensed-phase systems. 
 
-We choose to evaluate the potential for 3 million atoms, implying then a cubic box of `31.034` nm. The cutoff chosen for the computation here is `1.2`nm:
+We choose to evaluate the potential for 3 million atoms, implying then a cubic box of `31.034` nm. The `cutoff` chosen for the computation here is `1.2`nm, which is typical of molecular simulations:
 "
 
 # ╔═╡ 2ee76786-d6a2-404e-86aa-233c9dc2e73e

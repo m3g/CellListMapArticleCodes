@@ -29,7 +29,7 @@ Load the CellListMap package
 md"
 Here we show the types of periodic boundary conditions that `CellListMap` supports, and how the system box can be initialized.
 
-The relevant function here is the `Box` constructor, which will create an data structure of type `CellListMap.Box`, specific for one of the two unit cell types, type of data, and dimension. 
+The relevant function here is the `Box` constructor, which will create an data structure of type `CellListMap.Box`, specific for unit cell type, type of data, and dimension of the system. 
 
 The first example is:
 "
@@ -39,22 +39,22 @@ box1 = Box([10,20,15],1.2)
 
 # ╔═╡ 1b09e4cf-a776-46a0-bad5-14fa5f21bf14
 md"
-The input of the `Box` constructor received two parameters: 
+The input of the `Box` constructor contained two parameters: 
 
 - The box sides, given here by the three-dimensional vector `[10,20,15]`
 - The cutoff, `1.2`
 
-Thus, it is implicitly assumed here that the box is orthorhombic (because only sides are given), and that the system is three-dimensional (otherwise a 2D vector of sides would be given). It is also given that `Float64` numbers are used.
+Thus, it is implicit here that the box is orthorhombic (because only sides are given), and that the system is three-dimensional (otherwise a 2D vector of sides would be given). It is implicit given that `Float64` numbers are used, from the type of the cutoff variable, `typeof(1.2) == Float64`.
 
-Other properties of the `Box` are provided as output: the number of cells of the grid in each dimension, the computing cell sizes, the `lcell` parameter (which can be tuned for efficiency), and the final total number of cells.
+Other properties of the `Box` are provided as output: the number of cells of the grid in each dimension, the computing cell sizes, the `lcell` parameter ([which can be tuned for efficiency](https://m3g.github.io/CellListMap.jl/stable/performance/#Optimizing-the-cell-grid)), and the final total number of cells.
 
 A general triclinic unit cell can be used by providing instead of a vector of box sides, a complete unit cell matrix, where the columns of the matrix are the unit cell vectors. This is illustrated in the second example of the code block:
 "
 
 # ╔═╡ b1643bac-3de5-4afb-a370-990d0ec21c77
-box2 = Box([ 10 0 0
-             0 10 0
-             0 20 10 ], 1.2)
+box2 = Box([ 10  0  0
+              0 10  0
+              0 20 10 ], 1.2)
 
 # ╔═╡ 981183bb-abfc-45ef-8831-e54dec0d078c
 md"
@@ -64,7 +64,7 @@ To provide a constrasting example, here we construct a box with different dimens
 " 
 
 # ╔═╡ 90070e77-4e4f-4db1-b7a1-af7fcf233774
-box3 = Box( [10.f0, 20.f0]u"nm", 1.2f0u"nm")
+box3 = Box( [10.f0, 20.f0 ]u"nm", 1.2f0u"nm")
 
 # ╔═╡ 4ae9154e-c461-4e55-b09a-41b55160a963
 md"
@@ -244,7 +244,7 @@ uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 # ╟─c319e34e-b6a6-11ec-0b3e-c760ba59e0e0
 # ╟─7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 # ╟─b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6
-# ╠═562abb8e-37ed-4fac-8293-c47e7d1d6203
+# ╟─562abb8e-37ed-4fac-8293-c47e7d1d6203
 # ╟─c0027b3b-d932-410d-b64b-ea63689be612
 # ╠═a1171f7c-f044-45da-8f35-dc576d9ed901
 # ╟─1b09e4cf-a776-46a0-bad5-14fa5f21bf14

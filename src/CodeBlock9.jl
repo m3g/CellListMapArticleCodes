@@ -16,6 +16,9 @@ using Measurements
 # ╔═╡ aa105270-a04a-4952-90fd-e94777d9ec41
 using ForwardDiff
 
+# ╔═╡ a509b035-25fb-4198-b314-03c21489a7d0
+using BenchmarkTools
+
 # ╔═╡ c319e34e-b6a6-11ec-0b3e-c760ba59e0e0
 md"
 ### Code Blocks of the CellListMap.jl paper explained
@@ -40,14 +43,14 @@ Load the CellListMap package
 md"
 ### Units
 
-The common package to deal with units in Julia is `Unitful`. Here, we reproduce the simplest complete running code of Code Block 2, but using units for the variables.
+A popular package to deal with units in Julia is `Unitful`. Here, we reproduce the simplest complete running code of Code Block 2, but using units for the variables.
 
 First, we load the `Unitful` package:
  "
 
 # ╔═╡ b17481f8-b5d0-41fb-8223-9c8704ac94b0
 md"
-and, now, we reproduce the computation of the sum of the distances of 1000 particles, but where the units of the coordinates are nanometers. The particle coordinates are represented as a `3 x 1000` matrix, where the columns are associated to each particle. The complete code is, in this notebook, wrapped in a `let` block because `Pluto` requires on single instruction in each block:
+and, now, we reproduce the computation of the sum of the distances of 1000 particles, but where the units of the coordinates are nanometers. The particle coordinates are represented as a `3 x 1000` matrix, where the columns are associated to each particle. The complete code is, in this notebook, wrapped in a `let` block because `Pluto` (this notebook) requires on single instruction in each block:
 "
 
 # ╔═╡ 21b40e29-f829-4675-8bba-9ff00e664727
@@ -67,7 +70,7 @@ It is important to be careful in setting correctly the units for all quantities 
 md"
 ### Propagation of Uncertainties
 
-The `Measurements` package provides the support for propagating measurements:
+The `Measurements` package provides the support for propagating uncertainties:
 
 "
 
@@ -81,13 +84,13 @@ With this package, one can propagate measurements in operations with quantities 
 
 # ╔═╡ 296616d8-061b-4ad1-9333-be34c25fe8b3
 md"
-We can do the same with the complete calculation mapped through `CellListMap`. Here, we illustrate the calculation by providing coordinates as a vector of 3D vectors, or random coordinates with uncertainties. Other quantities have to be defined with uncertainties as well, and the result will have the uncertainties propagated to the final result:
+We can do the same with the complete calculation mapped through `CellListMap`. Here, we illustrate the calculation by providing coordinates as a vector of 3D vectors, with random coordinates containing uncertainties. Other quantities have to be defined with uncertainties as well, and the result will have the uncertainties propagated to the final result:
 "
 
 # ╔═╡ e586aedc-06b1-492c-8aa3-ca0c83e9b1b3
 let
-	x = [ [rand()±0.1 for _ in 1:3 ] for _ in 1:1000 ]
-	box = Box([1±0, 1±0, 1±0],0.05±0.0);
+	x = [ [rand() ± 0.1 for _ in 1:3 ] for _ in 1:1000 ]
+	box = Box([1 ± 0; 1 ± 0; 1 ± 0], 0.05 ± 0.0);
 	cl = CellList(x,box);
 	map_pairwise((x,y,i,j,d2,out) -> out += sqrt(d2), 0. ± 0., box, cl)
 end
@@ -113,7 +116,7 @@ end
 
 # ╔═╡ 668e2a8b-2dba-4ec0-ac1a-c5131b80258f
 md"
-Let us define the side and the cutoff, as usual:
+Let us define the side and the cutoff, as usual, noting that they will be converted to the appropriate type `T` inside the function above:
 "
 
 # ╔═╡ 5ef17bd3-372c-49b7-83e4-6ab4247526bb
@@ -146,15 +149,52 @@ and, finally, we can automatically differentiate this function, here, for exampl
 # ╔═╡ fe0e4fd7-6f9c-4457-8dc2-1ede4b7f3835
 ForwardDiff.gradient(x -> sum_d(x,sides,cutoff), coordinates)
 
+# ╔═╡ 5327ace0-1b45-49a0-b056-bb6d9a589fdf
+md"
+In this simple example, it is easy to confirm that this result is correct, by computing the gradient by hand, also using `CellListMap`:
+"
+
+# ╔═╡ b2e15594-43f0-4998-9f2b-93191122a858
+function ∇sum_d(x::Matrix{T},sides,cutoff) where T
+	box = Box(T.(sides),T(cutoff))
+	cl = CellList(x,box)
+	∇f = zeros(T,size(x))
+	return map_pairwise!(
+		(x,y,i,j,d2,∇f) -> begin
+			r = x - y
+			∇f[:,i] .= r / sqrt(d2)
+			∇f[:,j] .= -r / sqrt(d2)
+			return ∇f
+		end,
+		∇f, box, cl
+	)
+end
+
+# ╔═╡ 5e06aabe-a051-4635-93c2-0f0cb7b7775c
+∇sum_d(coordinates, sides, cutoff)
+
+# ╔═╡ 64de2303-3fca-4b84-b235-7e9cb4a31da0
+md"
+It is expected, though, that the manual implementation is faster, in general, and this is the case here:
+"
+
+# ╔═╡ 9e53b2aa-88f5-4634-8d25-c2ad1b45fd05
+@benchmark ForwardDiff.gradient(x -> sum_d(x,$sides,$cutoff), $coordinates)
+
+# ╔═╡ 98418030-ece5-40b4-81c1-e967e79170c8
+@benchmark ∇sum_d($coordinates, $sides, $cutoff)
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CellListMap = "69e1c6dd-3888-40e6-b3c8-31ac5f578864"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
+BenchmarkTools = "~1.3.1"
 CellListMap = "~0.7.13"
 ForwardDiff = "~0.10.25"
 Measurements = "~2.7.1"
@@ -176,6 +216,12 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[deps.BenchmarkTools]]
+deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
+git-tree-sha1 = "4c10eee4af024676200bc7752e536f858c6b8f93"
+uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+version = "1.3.1"
 
 [[deps.Calculus]]
 deps = ["LinearAlgebra"]
@@ -288,6 +334,12 @@ git-tree-sha1 = "abc9885a7ca2052a736a600f7fa66209f96506e1"
 uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
 version = "1.4.1"
 
+[[deps.JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "3c837543ddb02250ef42f4738347454f95079d4e"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.3"
+
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
@@ -379,6 +431,12 @@ git-tree-sha1 = "34c0e9ad262e5f7fc75b10a9952ca7692cfc5fbe"
 uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 version = "0.12.3"
 
+[[deps.Parsers]]
+deps = ["Dates"]
+git-tree-sha1 = "621f4f3b4977325b9128d5fae7a8b4829a0c2222"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "2.2.4"
+
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
@@ -392,6 +450,10 @@ version = "1.2.5"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[deps.Profile]]
+deps = ["Printf"]
+uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 
 [[deps.ProgressMeter]]
 deps = ["Distributed", "Printf"]
@@ -533,5 +595,12 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─e96f0d37-782f-4a91-ac04-f9b8d5272433
 # ╠═aa105270-a04a-4952-90fd-e94777d9ec41
 # ╠═fe0e4fd7-6f9c-4457-8dc2-1ede4b7f3835
+# ╟─5327ace0-1b45-49a0-b056-bb6d9a589fdf
+# ╠═b2e15594-43f0-4998-9f2b-93191122a858
+# ╠═5e06aabe-a051-4635-93c2-0f0cb7b7775c
+# ╟─64de2303-3fca-4b84-b235-7e9cb4a31da0
+# ╠═a509b035-25fb-4198-b314-03c21489a7d0
+# ╠═9e53b2aa-88f5-4634-8d25-c2ad1b45fd05
+# ╠═98418030-ece5-40b4-81c1-e967e79170c8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

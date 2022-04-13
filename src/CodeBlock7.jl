@@ -38,7 +38,7 @@ $\vec{f}_{ij} = -12\varepsilon\left(
 \frac{\sigma^{12}}{d^{13}} - \frac{\sigma^6}{d^7}
 \right)\frac{\vec{r}}{d}$
 
-where `\vec{r}` is the vector connecting the two particles, and $d = ||\vec{r}||$ is the distance between them. Considering the fact that the interface in `CellListMap` provides the squared distance, we can rewrite this equation as
+where $\vec{r}$ is the vector connecting the two particles, and $d = ||\vec{r}||$ is the distance between them. Considering the fact that the interface in `CellListMap` provides the squared distance, we can rewrite this equation as
 
 $\vec{f}_{ij} = -12\varepsilon\left(
 \frac{\sigma^{12}}{(d^2)^{7}} - \frac{\sigma^6}{(d^2)^4}
@@ -60,13 +60,16 @@ end
 
 # ╔═╡ 64b75ebb-5c70-4464-b6d1-c4ba15df7792
 md"
-As mentioned above, `r = y - x` is the vector connecting the two particles. One important detail is involved here, which is that we are writting the functions with the coordinates, and the forces, are given by arrays of 3D vectors. Typically, in Julia, these arrays will be vectors of static-vectors, or more specifically a `Vector{SVector{3,Float64}}` container. 
+As mentioned above, `r = y - x` is the vector connecting the two particles. 
+
+One important detail is involved here: we are assumint that the coordinates, and the forces, are given by arrays of 3D vectors. This is always the case for the `x` and `y` vectors given by the interface, and used in the example to compute `r`. The vector of forces, here, could be of another format, but it is typical and convenient that these arrays will be vectors of static-vectors, or more specifically a `Vector{SVector{3,Float64}}` container. This is fast and allows a compact syntax for operations on the coordinates, as in the example above.
 
 Thus, in the code above `dudr` is a 3D vector, because `r` is a 3D vector. And the lines that update the forces associated to each particle are updating the vector of forces in a one-line operation (`f[i] = f[i] + dudr`, for example).
 
 The computation of the forces require the relative position of the particles, thus here we explicitly use `x` and `y` from the standard interface, and we need the indexes of the particles to update the force vector accordingly. 
 
 We also need to provide the Lennard-Jones parameters and the force vector to be updated. The output variable here is the vectors of forces, thus it will be mutated.
+
 "
 
 # ╔═╡ 58d0db1e-e861-495a-95b8-5d4bd2b590cd
@@ -88,6 +91,8 @@ md"
 That is, given the coordinates and the box, we map the `flj` function through the pairs of particles that are within the cutoff, updating the `f` array of forces. 
 
 Note that, since `f` is mutale, we opt to use the `map_pairwise!` function, with the `!`, following the convention that, in Julia, functions ending with the `!` mutate one or more of its arguments. There is no need to reassign `f` from the output of `map_pairwise!`, since `f` is passed by sharing.
+
+**Note:** The computation will be run in parallel, but the update of the `f` vector above is thread-safe, because an independent copy of the array will be created for each thread. 
 
 To generate a system with atomic dimensions, we use a convenient test-constructor available within `CellListMap`:
 "

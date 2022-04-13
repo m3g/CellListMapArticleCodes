@@ -26,14 +26,14 @@ Load the CellListMap package
 md"
 In this block we implement the computation of the computation of a list of k nearest neighbors between two sets of particles. The purpose of example is to describe how to implement custom functions which require the implementation of custom parallel reduction functions.
 
-The list of neighbors will be a list of named tuples, for the form `(i=...,j=...,dsq=...)` where `i` and `j` are the indexes of the two atoms involved in the contact, and `dsq` is the squared distance between them.
+The list of neighbors will be a list of named tuples, of the form `(i=...,j=...,dsq=...)` where `i` and `j` are the indexes of the two atoms involved in the contact, and `dsq` is the squared distance between them.
 "
 
 # ╔═╡ 9b4c50bf-f8b8-4d07-bc4e-792072a74891
 md"
 ### Updating a list of neighbors
 
-To start, we need to define a function that, given a current `list` of neighbors, updates the list of the distance between two particles is found to be shorter for one pair. 
+To start, we need to define a function that, given a current `list` of neighbors, updates the list if a new pair of particles with a shorter distance than the maximum one in the list is found.
 
 For example, let us suppose that we have the following list:
 "
@@ -84,7 +84,7 @@ The function `replace_pair!` will be called for every pair of atoms found to be 
 md"
 ### Reducing lists computed in parallel
 
-To compute the list of neighbors in parallel we need to implement a custom reduction function. Thus, let us supose that we have computed the lists in parallel for independent subsets of the particles, in two threads. Two independent lists would have been obtained, for example:
+To compute the list of neighbors in parallel we need to implement a custom reduction function. Thus, let us supose that we have computed the lists in parallel for independent subsets of the particles, in two threads. Two independent lists would have been obtained. We store these two lists is a vector of lists:
 "
 
 # ╔═╡ 739180a6-b603-4968-9464-504aafb7534c
@@ -110,7 +110,7 @@ end
 
 # ╔═╡ 4b1d2cde-58a6-40fb-bf99-0b1e9cf37003
 md"
-The function will update the input list_reduced, which is initialized with +Inf values for the distances:
+The function will update the following input `list_reduced`, which is initialized with `+Inf` values for the distances:
 "
 
 # ╔═╡ b6585abe-e416-4ca5-911c-8abe4c1475f7
@@ -126,7 +126,7 @@ reduce_list(list_reduced, list_threaded)
 
 # ╔═╡ fa07cbd1-7e05-48a3-93b3-3ba7b0863d13
 md"
-which, as expected, retains the two pairs with the smaller distances. 
+which, as expected, retains the two pairs with the smallest distances. 
 "
 
 # ╔═╡ d957bc3e-ef5b-4c9b-9538-af2c1ce5a961

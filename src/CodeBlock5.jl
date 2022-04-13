@@ -61,9 +61,9 @@ u = map_pairwise(
 
 # ╔═╡ 87bafd9b-6b97-448a-b669-407e1b8aad83
 md"
-The inner interface of the function to be mapped presuposes a call with six arguments, `(x,y,i,j,d2,u)`, but here we only need the squared distance `d2` and the output to be updated, `u`. The function to be mapped, therefore, just ignore the additional parameters and sums to `u` the inverse of the distance between the particles.
+The inner interface of the function to be mapped presuposes a call with six arguments, `(x,y,i,j,d2,u)`, but here we only need the squared distance `d2` and the output to be updated, `u`. The function to be mapped, therefore, just ignores the additional parameters and sums to `u` the inverse of the distance between the particles.
 
-Note that the `cutoff` is implicit in the `box` constructor, and that function will only be evaluated for the pairs of particles found to be closer to each other than the cutoff. 
+Note that the `cutoff` is contained in the `box` structure, and that function will only be evaluated for the pairs of particles with distances smaller than the cutoff.  
 " 
 
 # ╔═╡ 5d25e653-5d5c-444b-a04a-045d3e7736ca

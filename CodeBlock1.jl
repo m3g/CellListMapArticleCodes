@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 562abb8e-37ed-4fac-8293-c47e7d1d6203
+# ╔═╡ a1171f7c-f044-45da-8f35-dc576d9ed901
 using CellListMap
 
 # ╔═╡ c319e34e-b6a6-11ec-0b3e-c760ba59e0e0
@@ -14,7 +14,7 @@ md"
 
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
-# Code Block 4
+# Code Block 1
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6
@@ -22,44 +22,52 @@ md"
 Load the CellListMap package
 "
 
-# ╔═╡ 6ec7d8b3-d8d2-4b33-af9e-d9e01c58988a
+# ╔═╡ f239d307-a7fe-4595-b14f-6ae64fc86483
 md"
-Here the cell list constructor will be explained. First, we create a random set of particles, similarly to what was done in Code Block 1:
+Generate a (3 x 100_000) matrix of random float64 numbers. Each colum of the
+matrix wil represent the coordinates of a particle.
 "
 
-# ╔═╡ 2744f768-1ecb-4b86-85c5-c2a54c573abf
+# ╔═╡ d10a0c9a-b669-46c5-af29-917984b65b31
 x = rand(3,10^5)
 
-# ╔═╡ b7089186-a3ca-4339-a837-5cc7897e7855
+# ╔═╡ 8fa22b07-dbd5-47ec-a7c2-0c29088a38d8
 md"
-And a `box`, orthorhombic in this case for simplicity, associated with a cutoff of `0.05`:
+Define the system box: here, we generate a box with cubic periodic
+boundary conditions, with side = 1. The cutoff above which particle
+interactions are ignored is set to 0.05.
 "
 
-# ╔═╡ 778f8336-e6cc-4c4c-beab-de2f29c52e89
+# ╔═╡ bd95214b-a0c8-4b11-baf2-6fe59a54a5c4
 box = Box([1,1,1],0.05)
 
-# ╔═╡ c0027b3b-d932-410d-b64b-ea63689be612
-md"
-Constructing the cell lists consists on identifying in the region (the cell) in space where each particle is located. It also implyies, here, in the replication of the particles along the periodic boundaries, because this allows for a faster computation of properties later, avoiding the necessity of computing minimum images during the function mapping stage. 
-
-Calling the `CellList` constructor is simple with the coordinates of the particles and the `box`: 
+# ╔═╡ 5df3d89e-33d4-4c12-86af-cc0b41eebe71
+ md"
+ Compute the cell lists: the coordinates of the particles involved
+ and the box properties are required.
 "
 
-# ╔═╡ a1171f7c-f044-45da-8f35-dc576d9ed901
+# ╔═╡ 1dd597ee-3e67-440e-9b1e-8f4d66bd9698
 cl = CellList(x,box)
 
-# ╔═╡ 684536df-ed9c-4be2-8dad-946bb53dd32a
+# ╔═╡ 9bed3fb2-6aa2-4980-8b08-c1de9ea42c20
 md"
-The output contains some data that is relevant for the mapping phase: 
+Finaly, let us compute the sum of the distances of the particles. The first argument of the following function is an anonymous function: 
+```
+      (x,y,i,j,d2,output) -> output += sqrt(d2)
+```
+ which can be read as a function that receives 6 parameters `(x,y,i,j,d2,output)`, and updates the output parameter by summing to it the `sqrt(d2)`. This calculation will
+ be performed for every pair of particles which are found to be within  the cutoff distance. 
 
-- The dimension, `3` of the space.
-- The type of variable, here `Float64`
-- The number of *real* particles.
-- The number of cells containing real particles.
-- The total number of particles, including images.
+ The second argument, `0.` is the initial value of the output.
 
-The total number of particles will be always greater than the number of real particles, because it includes the particles replicated at the boundaries. 
-" 
+ The third argument is the `box`, as defined above.
+
+ The fourth argument is the cell list data structure, as computed above in `cl`.
+"
+
+# ╔═╡ 79d91bc5-d862-4c8a-a691-d6c89ee8481e
+map_pairwise( (x,y,i,j,d2,output) -> output += sqrt(d2), 0., box, cl )
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -222,13 +230,14 @@ uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 # ╟─c319e34e-b6a6-11ec-0b3e-c760ba59e0e0
 # ╟─7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 # ╟─b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6
-# ╠═562abb8e-37ed-4fac-8293-c47e7d1d6203
-# ╟─6ec7d8b3-d8d2-4b33-af9e-d9e01c58988a
-# ╠═2744f768-1ecb-4b86-85c5-c2a54c573abf
-# ╟─b7089186-a3ca-4339-a837-5cc7897e7855
-# ╠═778f8336-e6cc-4c4c-beab-de2f29c52e89
-# ╟─c0027b3b-d932-410d-b64b-ea63689be612
 # ╠═a1171f7c-f044-45da-8f35-dc576d9ed901
-# ╟─684536df-ed9c-4be2-8dad-946bb53dd32a
+# ╟─f239d307-a7fe-4595-b14f-6ae64fc86483
+# ╠═d10a0c9a-b669-46c5-af29-917984b65b31
+# ╟─8fa22b07-dbd5-47ec-a7c2-0c29088a38d8
+# ╠═bd95214b-a0c8-4b11-baf2-6fe59a54a5c4
+# ╟─5df3d89e-33d4-4c12-86af-cc0b41eebe71
+# ╠═1dd597ee-3e67-440e-9b1e-8f4d66bd9698
+# ╟─9bed3fb2-6aa2-4980-8b08-c1de9ea42c20
+# ╠═79d91bc5-d862-4c8a-a691-d6c89ee8481e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

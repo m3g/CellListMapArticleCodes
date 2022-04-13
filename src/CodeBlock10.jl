@@ -28,9 +28,9 @@ md"
 
 # ╔═╡ b68cfd92-d1b3-4f33-b9bf-8f72b101a5b9
 md"
-In this block we implement the computation of a histogram of \"galactic\" pair velocities, which is a common computation in astrophysical simulation analsys. The computation consists in obtainin an histogram of the relative velocities of the galaxies, as a function of their distances. 
+In this block we implement the computation of a histogram of \"galactic\" pair velocities, which is typical of astrophysical simulation analsys. The computation consists in obtainin an histogram of the relative velocities of the galaxies, as a function of their distances. 
 
-Thus, for each distance between the galaxies, we want to obtain the average relative speed between the galaxies. This involves counting the number of pairs of galaxies at each distance, summing up their relative velocities, and averaging at the end.
+Thus, for each distance between the galaxies, we want to obtain the average relative speed between the galaxies. This involves counting the number of pairs of galaxies at each distance, summing up their relative velocities, and averaging.
 
 Besides being an example which implements a practical application of the package outside the field of molecular simulations, this codes illustrates how to use input properties that are not needed for the construction of the cell lists (the velocities), and updating mutable outputs.
 "
@@ -47,7 +47,7 @@ And here we will use the `norm` function from `LinearAlgebra`, for simplicity:
 
 # ╔═╡ 26b00d28-9884-4e0d-b4b3-be4e06edb6e4
 md"
-The purpose of the code is to build an histogram of relative velocities, as a function of the distances between the galaxies. Thus, our output will be a matrix with 2 columns, the first will contain the number of pairs of galaxies found at each distance. The second column will, initially, sum the relative velocities of the galaxies, and finally return the average relative velocity (by dividing the second column by the first column).
+The purpose of the code is to build an histogram of relative velocities, as a function of the distances between the galaxies. Thus, our output will be a matrix with 2 columns, the first will contain the number of pairs of galaxies found at each distance. The second column will contain the sum of the relative velocities of the galaxies found to be at the range of distances of the corresponding histogram bin. At the end, the data of the second column will be divided by the data of the first column, to return the average pairwise velocities. 
 "
 
 # ╔═╡ fd5d7c8b-653c-4a49-b62e-4b8610cce854
@@ -75,7 +75,7 @@ The function receives the indexes of the particles, which are important because 
 
 It receives the squared distance, `d2`, which comes from the `CellListMap` interface. Additionally, two parameters will be closed over by the function: the distance step of the histogram (`binstep`) and the array of velocities `vel`, containing the velocity of each galaxy. 
 
-Finally, the `hist` variable contains the `2 x N` histogram, which is the output to be updated, as described above.
+Finally, the `hist` variable contains the `N x 2` histogram, which is the output to be updated, as described above.
 
 Let us experiment with this function. First, we define an empty histogram, similar to the one we will use in the actual calculation:
 
@@ -99,7 +99,7 @@ Using a `binstep` of `0.5`, and assuming that the pair of galaxies with `i=2` an
 "
 
 # ╔═╡ acdb8062-5edb-477a-8baf-b07345f630b9
-up_histogram!(2,5,3.0^2,vel_test,0.5,hist_test)
+up_histogram!( 2, 5, 3.0^2, vel_test, 0.5, hist_test)
 
 # ╔═╡ f603c345-c0f3-4475-b6f2-8c0971a8e503
 md"
@@ -144,7 +144,7 @@ vel = [ rand(SVector{3,Float64}) for _ in pos ]
 md"
 ### Computing the histogram
 
-With thge above that, we only need to initialize the histogram, compute the cell lists and map the `up_histogram!` function:
+With the above data, we only need to initialize the histogram, compute the cell lists and map the `up_histogram!` function:
 
 "
 
@@ -188,7 +188,7 @@ hist[:,2] ./ hist[:,1]
 
 # ╔═╡ 41d778c5-f319-4152-8299-bcff8769b7ea
 md"
-Since the velocities were randomly generated, the histogram is simply flat.
+Since the velocities were randomly generated, the histogram is flat.
 "
 
 # ╔═╡ e757b754-1179-4553-bd41-56ac34f5685b
@@ -202,7 +202,7 @@ bar(
 
 # ╔═╡ 3da1c372-bc51-4970-9424-83302ec0909d
 md"
-In the code block, we have put all these steps inside a single function, which is actually recommended to avoid type instabilities. Thus, the function of the code block is:
+In the code block, we have put all these steps inside a single function, which is actually recommended to avoid type instabilities (the velocities and the histogram, in particular, may be type-unstable if used in global scope). Thus, the function of the code block is:
 "
 
 # ╔═╡ c5346c37-c977-4355-8415-a00786b2c3cd
@@ -1179,7 +1179,7 @@ version = "0.9.1+5"
 # ╠═1ed49e14-1cca-4aae-b542-842a90e05ab9
 # ╠═0b3a5604-079a-4ec2-abee-6acfb7d6511c
 # ╟─b5572781-0ac0-4c3f-875f-20aa57c010ef
-# ╠═acdb8062-5edb-477a-8baf-b07345f630b9
+# ╟─acdb8062-5edb-477a-8baf-b07345f630b9
 # ╟─f603c345-c0f3-4475-b6f2-8c0971a8e503
 # ╟─0ecf56d5-71d6-41da-bdfa-93c377b392ee
 # ╠═31f3e90a-ac38-4c9d-885d-3c0a84d5307d
