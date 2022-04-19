@@ -15,6 +15,8 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 1
+
+**Minimal working example for the computation of the sum of distances of 100k particles in a cubic periodic box of side 1 and a cutoff of 0.05.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6

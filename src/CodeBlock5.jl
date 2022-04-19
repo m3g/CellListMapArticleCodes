@@ -15,6 +15,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 5
+**Mapping the computation of a property into the pairs of particles which, according to the cell lists and system box properties, are within the desired cutoff.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6

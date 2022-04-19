@@ -24,6 +24,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 10
+**Computing a histogram of average pairwise velocities between galaxies, as a function of their relative distances, a typical calculation in astrophysical simulations.**
 "
 
 # ╔═╡ b68cfd92-d1b3-4f33-b9bf-8f72b101a5b9

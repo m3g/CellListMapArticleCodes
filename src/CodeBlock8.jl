@@ -15,6 +15,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 8
+**Example code for the calculation of a nearest-neighbor list between two independent sets of particles. A custom reduction function is required to merge lists, keeping the minimum distances.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6

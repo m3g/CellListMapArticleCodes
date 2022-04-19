@@ -27,6 +27,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 9
+**Units, uncertainties, and automatic differentiation propagating through pairwise computations with CellListMap.jl.**
 "
 
 # ╔═╡ b68cfd92-d1b3-4f33-b9bf-8f72b101a5b9

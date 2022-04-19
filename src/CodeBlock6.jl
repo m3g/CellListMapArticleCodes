@@ -21,6 +21,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 6
+**Calculation of a simple Lennard-Jones potential energy of 3 million Neon atoms in 3 dimensions, in a periodic cubic box with sides of 31.034 nm and a cutoff of 1.2 nm.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6

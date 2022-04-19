@@ -18,6 +18,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 7
+**Example code for the calculation of a vector of forces between particles. The function will update the `f` vector.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6

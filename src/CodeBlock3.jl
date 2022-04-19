@@ -18,6 +18,7 @@ md"
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
 # Code Block 3
+**Initialization of the system Box, with orthorhombic or triclinic periodic boundary conditions. The system’s geometry is defined by the type of unit cell matrix, and an orthorhombic cell is assumed if a vector of box sides is supplied.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6

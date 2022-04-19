@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ a1171f7c-f044-45da-8f35-dc576d9ed901
+# ╔═╡ 562abb8e-37ed-4fac-8293-c47e7d1d6203
 using CellListMap
 
 # ╔═╡ c319e34e-b6a6-11ec-0b3e-c760ba59e0e0
@@ -14,7 +14,8 @@ md"
 
 # ╔═╡ 7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 md"
-# Code Block 1
+# Code Block 2
+**General format of the function to be evaluated for each pair of particles closer than the cutoff distance, to be passed to the map_pairwise function.**
 "
 
 # ╔═╡ b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6
@@ -22,52 +23,92 @@ md"
 Load the CellListMap package
 "
 
-# ╔═╡ f239d307-a7fe-4595-b14f-6ae64fc86483
+# ╔═╡ c0027b3b-d932-410d-b64b-ea63689be612
 md"
-Generate a (3 x 100_000) matrix of random float64 numbers. Each colum of the
-matrix wil represent the coordinates of a particle.
+In this block we show general format that the function to be computed for the pairs of particles within the cutoff must have, to conform with the interface of the package:
+"
+
+# ╔═╡ a1171f7c-f044-45da-8f35-dc576d9ed901
+function f(x,y,i,j,d2,output,args...)
+    # evaluate property for pair i,j and update output variable
+    return output
+end
+
+# ╔═╡ 247a33ae-2796-4920-859f-869560164632
+md"
+The function interface provides six arguments `(x,y,i,j,d2,output)`, which are:
+
+- `x`: The coordinates of the first particle.
+- `y`: The coordinates of the second particle (minimum image relative to `x`).
+- `i`: The index in the array of coordinates of the first particle.
+- `j`: The index in the array of coordinates of the second particle.
+- `d2`: The squared distance between the particles (i. e. $||y-x||^2$)
+- `output`: the value of the output variable.
+
+Additional arguments can be provided if the function requires them, for examples particle masses, etc. 
+
+Let us generate some coordinates, a system box, and the cell lists, to be able to provide examples:
 "
 
 # ╔═╡ d10a0c9a-b669-46c5-af29-917984b65b31
 x = rand(3,10^5)
 
-# ╔═╡ 8fa22b07-dbd5-47ec-a7c2-0c29088a38d8
-md"
-Define the system box: here, we generate a box with cubic periodic
-boundary conditions, with side = 1. The cutoff above which particle
-interactions are ignored is set to 0.05  adfaf 
-"
-
 # ╔═╡ bd95214b-a0c8-4b11-baf2-6fe59a54a5c4
 box = Box([1,1,1],0.05)
-
-# ╔═╡ 5df3d89e-33d4-4c12-86af-cc0b41eebe71
- md"
- Compute the cell lists: the coordinates of the particles involved
- and the box properties are required.
-"
 
 # ╔═╡ 1dd597ee-3e67-440e-9b1e-8f4d66bd9698
 cl = CellList(x,box)
 
 # ╔═╡ 9bed3fb2-6aa2-4980-8b08-c1de9ea42c20
 md"
-Finaly, let us compute the sum of the distances of the particles. The first argument of the following function is an anonymous function: 
-```
-      (x,y,i,j,d2,output) -> output += sqrt(d2)
-```
- which can be read as a function that receives 6 parameters `(x,y,i,j,d2,output)`, and updates the output parameter by summing to it the sqrt(d2). This calculation will
- be performed for every pair of particles which are found to be within  the cutoff distance. 
+One of the simplest computations possible is the sum of the distances. The function could be defined like this:
+"
 
- The second argument, `0.` is the initial value of the output.
+# ╔═╡ 7037d17d-7e7e-4119-bb5c-e74898dc1181
+function sum_distances(d2,output)
+    output += sqrt(d2)
+	return output
+end
 
- The third argument is the `box`, as defined above.
-
- The fourth argument is the cell list data structure, as computed above in `cl`.
+# ╔═╡ f96176a5-d9d2-44be-8a21-2c4c1f045466
+md"
+But this function does not conform with the interface. Thus, when calling `map_pairwise` function, we define an anonymous function that adjusts the function call:
 "
 
 # ╔═╡ 79d91bc5-d862-4c8a-a691-d6c89ee8481e
-map_pairwise( (x,y,i,j,d2,output) -> output += sqrt(d2), 0., box, cl )
+map_pairwise( (x,y,i,j,d2,output) -> sum_distances(d2,output), 0., box, cl )
+
+# ╔═╡ bbd85682-65ee-4d0c-b12c-36b1d9fc1fda
+md"
+Now, let us suppose that each particle has a mass, and we want to compute the product of the masses divided by the distance. Here are the mass arrays:
+"
+
+# ╔═╡ 1ff7a23d-560e-47d8-9f64-c8173681d167
+mass = rand(10^5)
+
+# ╔═╡ 52d9b1df-daef-4aef-8125-ff8cd54d253c
+md"
+The function to be computed is, now:
+"
+
+# ╔═╡ 59a19df0-607e-4c1f-b9ba-590f494196c5
+function u(i,j,d2,output,mass)
+	output += mass[i]*mass[j]/sqrt(d2)
+	return output
+end
+
+# ╔═╡ 9c0a0719-1d0d-4d1a-9c67-6458dce71105
+md"
+And finaly, to conform to the interface of `map_pairwise`, an anonymous function is used in the call, which closes over the masses:
+"
+
+# ╔═╡ e390cdb4-94e2-4435-8014-44973d789648
+map_pairwise( (x,y,i,j,d2,output) -> u(i,j,d2,output,mass), 0., box, cl )
+
+# ╔═╡ 155dc0e8-afa0-4b57-b5bb-bd5d6aa116ce
+md"
+Thus, while the input interface of the function is strict, any combination of the parameters required and additional parameters can be used.
+"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -230,14 +271,23 @@ uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 # ╟─c319e34e-b6a6-11ec-0b3e-c760ba59e0e0
 # ╟─7dbfadf4-2cb8-4145-948f-df1e7ea06b14
 # ╟─b8f7a5e0-2ed6-4df5-8c76-aeff9c113ab6
+# ╠═562abb8e-37ed-4fac-8293-c47e7d1d6203
+# ╟─c0027b3b-d932-410d-b64b-ea63689be612
 # ╠═a1171f7c-f044-45da-8f35-dc576d9ed901
-# ╟─f239d307-a7fe-4595-b14f-6ae64fc86483
+# ╟─247a33ae-2796-4920-859f-869560164632
 # ╠═d10a0c9a-b669-46c5-af29-917984b65b31
-# ╟─8fa22b07-dbd5-47ec-a7c2-0c29088a38d8
 # ╠═bd95214b-a0c8-4b11-baf2-6fe59a54a5c4
-# ╟─5df3d89e-33d4-4c12-86af-cc0b41eebe71
 # ╠═1dd597ee-3e67-440e-9b1e-8f4d66bd9698
 # ╟─9bed3fb2-6aa2-4980-8b08-c1de9ea42c20
+# ╠═7037d17d-7e7e-4119-bb5c-e74898dc1181
+# ╟─f96176a5-d9d2-44be-8a21-2c4c1f045466
 # ╠═79d91bc5-d862-4c8a-a691-d6c89ee8481e
+# ╟─bbd85682-65ee-4d0c-b12c-36b1d9fc1fda
+# ╠═1ff7a23d-560e-47d8-9f64-c8173681d167
+# ╟─52d9b1df-daef-4aef-8125-ff8cd54d253c
+# ╠═59a19df0-607e-4c1f-b9ba-590f494196c5
+# ╟─9c0a0719-1d0d-4d1a-9c67-6458dce71105
+# ╠═e390cdb4-94e2-4435-8014-44973d789648
+# ╟─155dc0e8-afa0-4b57-b5bb-bd5d6aa116ce
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
