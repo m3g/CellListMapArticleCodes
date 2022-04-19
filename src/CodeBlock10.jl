@@ -158,7 +158,7 @@ Since our cutoff is 5.0, and our histogram has 10 bins, we use:
 "
 
 # ╔═╡ be2c146b-53ac-4b7a-96fb-d752c5c57c42
-binstep = 0.5 # cutoff is 5 (thus the histogram has 10 positions)
+binstep = 0.5 # cutoff is 5 (the histogram has 10 positions)
 
 # ╔═╡ 804823db-8c12-4cd6-b2ed-928b96de61f1
 md"
@@ -175,7 +175,7 @@ And, finally, map the `up_histogram!` through the cell lists:
 
 # ╔═╡ 77363ec5-df4e-4c7c-8406-e07587948f97
     map_pairwise!(
-        (x,y,i,j,d2,out) -> up_histogram!(i,j,d2,vel,binstep,hist),
+        (x,y,i,j,d2,hist) -> up_histogram!(i,j,d2,vel,binstep,hist),
         hist, box, cl,
     )
 
@@ -189,7 +189,7 @@ hist[:,2] ./ hist[:,1]
 
 # ╔═╡ 41d778c5-f319-4152-8299-bcff8769b7ea
 md"
-Since the velocities were randomly generated, the histogram is flat.
+The velocities were randomly generated, the histogram is flat.
 "
 
 # ╔═╡ e757b754-1179-4553-bd41-56ac34f5685b
@@ -214,7 +214,7 @@ function pairwise_velocities(N)
     binstep = 0.5 # cutoff is 5.0
     cl = CellList(pos,box)
     map_pairwise!(
-        (x,y,i,j,d2,out) -> up_histogram!(i,j,d2,vel,binstep,hist),
+        (x,y,i,j,d2,hist) -> up_histogram!(i,j,d2,vel,binstep,hist),
         hist, box, cl,
     )
     return hist[:,2] ./ hist[:,1]

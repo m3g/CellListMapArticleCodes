@@ -1,5 +1,6 @@
 [deps]
 CellListMap = "69e1c6dd-3888-40e6-b3c8-31ac5f578864"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
 
 [compat]
 CellListMap = "0.7.13"
